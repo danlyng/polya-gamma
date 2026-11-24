@@ -292,6 +292,7 @@ impl<R: SeedableRng + Rng + Clone + Send + Sync> GibbsNegativeBinomial<R> {
         true_coefficients: Option<Vec<f64>>,
         true_r: Option<f64>,
     ) -> Result<NegativeBinomialResults, Box<dyn Error>> {
+        let gagged = gag::Gag::stderr();
         let n = self.x.nrows();
         let p = self.x.ncols();
         let dim = p + n + 1; // Parameters + latent variables + r
@@ -333,7 +334,7 @@ impl<R: SeedableRng + Rng + Clone + Send + Sync> GibbsNegativeBinomial<R> {
 
         // Compute posterior mean for r
         let posterior_mean_r = pooled.column(p + n).mean().unwrap();
-
+        drop(gagged);
         Ok(NegativeBinomialResults {
             posterior_means,
             posterior_sds,

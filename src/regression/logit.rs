@@ -284,6 +284,7 @@ impl<R: SeedableRng + Rng + Clone + Send + Sync> GibbsLogit<R> {
         samples: usize,
         true_coefficients: Option<Vec<f64>>,
     ) -> Result<LogisticRegressionResults, Box<dyn Error>> {
+        let gagged = gag::Gag::stderr();
         let n = self.x.nrows();
         let p = self.x.ncols();
         let dim = p + n; // Parameters + latent variables
@@ -308,6 +309,7 @@ impl<R: SeedableRng + Rng + Clone + Send + Sync> GibbsLogit<R> {
 
         // Create and run the Gibbs sampler
         let mut gibbs = GibbsSampler::new(cond, init).set_seed(self.seed);
+
         let (all_samples, run_stats) = gibbs.run_progress(samples, burn_in)?;
 
         // Process results
@@ -319,7 +321,7 @@ impl<R: SeedableRng + Rng + Clone + Send + Sync> GibbsLogit<R> {
         let posterior_sds: Vec<f64> = (0..p)
             .map(|j| pooled.column(j).std(1.0)) // 1.0 for sample standard deviation
             .collect();
-
+        drop(gagged);
         Ok(LogisticRegressionResults {
             posterior_means,
             posterior_sds,
