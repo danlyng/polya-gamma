@@ -113,9 +113,10 @@ impl PolyaGamma {
         1.0 / (1.0 + exp_terms)
     }
 
-    /// Calculate the density of the Jacobi distribution at `x` (coefficient term for the Polya-Gamma distribution approximation.
+    /// Calculate a coefficient of the alternating series for the Jacobi density at `x`.
     ///
-    /// For more information, see equations 15 and 16 in the Polson et al. (2013).
+    /// See equations (8) and (9) in Windle, Polson and Scott (2014):
+    /// <https://arxiv.org/pdf/1405.0506#page=7>.
     ///
     /// # Arguments
     /// * `n` - The index term in the series expansion
@@ -145,9 +146,9 @@ impl PolyaGamma {
                 ig.pdf(x) * 2.0
             }
         } else {
-            // For large x, use the exponential distribution with parameterization
-            // Exp(PI*k/(PI^2*k^3))
-            let scale = 1.0 / (PI * k0 * k0);
+            // Exp(rate = PI^2*k^2/2) has density rate * exp(-rate*x).
+            // Scale by PI*k/rate to obtain the coefficient PI*k * exp(-rate*x).
+            let scale = 2.0 / (PI * k0);
             if n < self.series_exp.len() {
                 // Use precomputed distribution if available
                 scale * self.series_exp[n].pdf(x)
