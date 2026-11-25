@@ -3434,7 +3434,7 @@ dependencies = [
 
 [[package]]
 name = "polya-gamma"
-version = "0.5.3"
+version = "0.6.0"
 dependencies = [
  "approx",
  "criterion",
